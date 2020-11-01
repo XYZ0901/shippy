@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"google.golang.org/grpc"
+	"github.com/micro/go-micro/v2"
 	"io/ioutil"
 	"log"
 	"os"
@@ -17,13 +17,12 @@ const (
 )
 
 func main() {
-	conn, err := grpc.Dial(ADDRESS, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("connect error: %v", err)
-	}
-	defer conn.Close()
+	service := micro.NewService(
+		micro.Name("go.micro.srv.consignment.cli"))
 
-	client := pb.NewShippingServiceClient(conn)
+	service.Init()
+
+	client := pb.NewShippingService("go.micro.srv.consignment", service.Client())
 
 	infoFile := DEFAULT_INFO_FILE
 	if len(os.Args) > 1 {

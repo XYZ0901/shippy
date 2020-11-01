@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  consignment:
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./build/package/Dockerfile-service
+    depends_on:
+      - datastore
+      - vessel
+    links:
+      - datastore
+    ports:
+      - 50051:50051
+    environment:
+      MICRO_SERVER_ADDRESS: ":50051"
+      DB_HOST: "mongodb://datastore:27017"
+
+  vessel:
+    restart: always
+    build:
+      context: ../.
+      dockerfile: ./build/package/Dockerfile-vessel
+    ports:
+      - 50052:50051
+    environment:
+      MICRO_SERVER_ADDRESS: ":50051"
+      DB_HOST: "mongodb://datastore:27017"
+
+  # Commands
+  cli:
+    build:
+      context: ../.
+      dockerfile: ./build/package/Dockerfile-cli
+
+  datastore:
+    image: mongo
+    container_name: datastore
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017
+    command: mongod --logpath=/dev/null

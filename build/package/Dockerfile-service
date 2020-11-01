@@ -1,0 +1,11 @@
+FROM golang:1.15.3
+
+RUN mkdir /shippy
+
+WORKDIR /shippy
+
+COPY . .
+
+RUN go build -o shippy-service ./consignment-service
+
+CMD ["./shippy-service"]
